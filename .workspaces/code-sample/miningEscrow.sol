@@ -26,6 +26,9 @@ contract MudMiningEscrow {
     MetaUserDAOToken token;
     address immutable admin;
 
+    event depositEvt(uint256 depositId);
+    event breakContractEvt(uint256 burnAmount, uint256 amountLeft);
+    event withdrawEvt(uint256 freeAmount, uint256 lockedAmount);
     
     constructor()  {
         admin = address(msg.sender);
@@ -54,6 +57,8 @@ contract MudMiningEscrow {
         
         require(token.transferFrom(msg.sender, address(this), amount), "Token transferFrom failed !");
         
+        //emit deposit id
+        emit depositEvt(end);
         return end;
     }
     
@@ -65,8 +70,10 @@ contract MudMiningEscrow {
         require(block.timestamp > _logbook[msg.sender][contractId].startTime, "time should > contract startTime");
         
         if (block.timestamp > _logbook[msg.sender][contractId].endTime) {
+            emit breakContractEvt(0, _logbook[msg.sender][contractId].amount);
             return (0, _logbook[msg.sender][contractId].amount); //0 burnt, all amount free for withdraw
         } else if (block.timestamp + 86400 >= _logbook[msg.sender][contractId].endTime) { //the contract will end sooner than 24 hours so no need to break earlier. burnAmount == contract amount means no break needed
+            emit breakContractEvt(_logbook[msg.sender][contractId].amount, _logbook[msg.sender][contractId].amount);
             return (_logbook[msg.sender][contractId].amount, _logbook[msg.sender][contractId].amount); //all amount still waiting for mature within 24 hrs        
         } else { //if (now + 86400 < _logbook[msg.sender][contractId].endTime), burn 20% tokens immediately and end the contract after 24 hours from now before the end time
             //burn 20%
@@ -76,7 +83,8 @@ contract MudMiningEscrow {
 
             require(token.increaseAllowance(address(this), burnAmount), "increaseAllowance failed!");
             token.burnFrom(address(this), burnAmount);
-            
+
+            emit breakContractEvt(burnAmount, _logbook[msg.sender][contractId].amount);   
             return (burnAmount, _logbook[msg.sender][contractId].amount);
         }
     }
@@ -150,6 +158,7 @@ contract MudMiningEscrow {
             require(token.transfer(msg.sender, freeAmount), "Token transfer failed !");           
         }
         
+        emit withdrawEvt(freeAmount, lockedAmount);
         return (freeAmount, lockedAmount);
     }
    

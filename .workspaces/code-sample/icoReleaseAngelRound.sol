@@ -18,6 +18,7 @@ contract MudAngelRoundReleaseBank {
     MetaUserDAOToken token;
 
     event icodeposit(address indexed investorAddress, uint256 amount, uint256 balance);
+    event releasetoken(uint256 freeAmount, uint256 balance);
 
     struct Transaction {
         bool locked;
@@ -122,6 +123,7 @@ contract MudAngelRoundReleaseBank {
         bank[msg.sender].balance = bank[msg.sender].balance - freeAmount;
         require(token.transfer(msg.sender, freeAmount), "token transfer failed!");
         
+        emit releasetoken(freeAmount, bank[msg.sender].balance);
         return (freeAmount, bank[msg.sender].balance);
     }
     

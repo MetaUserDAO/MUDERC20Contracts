@@ -25,12 +25,13 @@ contract MudMiningPool {
     
     event icodeposit(uint256 amount, uint256 balance);
     event miningstart(uint lastHalvingTime);
-    event dailysettlement(address indexed dappaddr, uint256 burntAmount, uint256 minedAmount, uint256 totalfreeamount);
+    event dailysettlement(uint256 burntAmount, uint256 minedAmount, uint256 totalfreeamount);
+    event withdrawevt(uint256 amount);
 
     constructor() {
         admin = address(msg.sender);
         token = UtilityFunctions.getMudToken();
-        dailyMiningLimit = 104166660000; //104166.66 MUD per day
+        dailyMiningLimit = 100354078820; //100354.078820 MUD per day
     }
     
     function icoDeposit(uint256 amount) external returns (uint256) {
@@ -122,7 +123,7 @@ contract MudMiningPool {
         require(_totalFreeAmount <= token.balanceOf(address(this)), "Not enough tokens available !");
         
         //burn token from the pool with 2:1 ratio of totalAmount:burntAmount
-        uint256 amountToBurn = totalAmount / 2;
+        uint256 amountToBurn = totalAmount / 2 + (combinedDailyLimit - totalAmount);
         uint256 leftover = token.balanceOf(address(this)) - _totalFreeAmount;
 
         if (leftover < amountToBurn) {
@@ -134,7 +135,7 @@ contract MudMiningPool {
             token.burnFrom(address(this), amountToBurn);
         }
 
-        emit dailysettlement(msg.sender, amountToBurn, totalAmount, _totalFreeAmount);
+        emit dailysettlement(amountToBurn, totalAmount, _totalFreeAmount);
         return (amountToBurn, totalAmount, _totalFreeAmount);
     }
 
@@ -156,6 +157,7 @@ contract MudMiningPool {
         _totalFreeAmount = _totalFreeAmount - amount;
         require(token.transfer(msg.sender, amount), "Token transfer failed !");
         
+        emit withdrawevt(amount);
         return amount;
     }
 }

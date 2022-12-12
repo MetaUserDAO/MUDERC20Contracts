@@ -10,7 +10,7 @@ import "./UtilityFunctions.sol";
 contract MudABRoundReleaseBank {
      
     address immutable admin; //contract creator
-    uint256 constant ABRoundLimit = 2.5e14;//250000000000000;//rouna A and B total limit 250000000 MUD
+    uint256 constant ABRoundLimit = 3e14;//300000000000000;//rouna A and B total limit 250000000 MUD
     uint256 constant dailyRate = 92590; //0.0009259 daily release rate 0.09259%
     uint constant secPerDay = 86400;
     uint256 private _icoDepositTotal;
@@ -18,6 +18,7 @@ contract MudABRoundReleaseBank {
     MetaUserDAOToken token;
 
     event icodeposit(address indexed investorAddress, uint256 amount, uint256 balance);
+    event releasetoken(uint256 freeAmount, uint256 balance);
                                                
     struct Transaction {
         bool locked;
@@ -118,7 +119,8 @@ contract MudABRoundReleaseBank {
         bank[msg.sender].lastTime = bank[msg.sender].lastTime + maturedDays * secPerDay;//should set to the exact spot based on 24 hours
         bank[msg.sender].balance = bank[msg.sender].balance - freeAmount;
         require(token.transfer(msg.sender, freeAmount), "token transfer failed !");
-        
+
+        emit releasetoken(freeAmount, bank[msg.sender].balance);        
         return (freeAmount, bank[msg.sender].balance);
     }
     
