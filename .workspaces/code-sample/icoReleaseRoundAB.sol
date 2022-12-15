@@ -17,7 +17,7 @@ contract MudABRoundReleaseBank {
     bool private _icoFinished;
     MetaUserDAOToken token;
 
-    event icodeposit(address indexed investorAddress, uint256 amount, uint256 balance);
+    event icodepositEvt(uint256 releaseStartTime, uint256 totalLocked);
     event releasetoken(uint256 freeAmount, uint256 balance);
                                                
     struct Transaction {
@@ -43,6 +43,7 @@ contract MudABRoundReleaseBank {
     *     amount: amount of MUD coin received from AB round 
     * return:  total coins deposited in the contract    
     */
+    /*
     function icoDeposit(address investorAddress, uint256 amount) external returns (uint256) {
         require(msg.sender == admin, "Only admin can deposit.");
         require(!_icoFinished, "ICO finished!");
@@ -62,6 +63,34 @@ contract MudABRoundReleaseBank {
        
         emit icodeposit(investorAddress, amount, _icoDepositTotal);
         return _icoDepositTotal;
+    }
+    */
+
+    function icoDeposits(address[] calldata addressArray, uint256[] calldata balanceArray) external returns (uint256, uint256){
+        require(msg.sender == admin, "Only admin can deposit.");
+        require(!_icoFinished, "ICO finished!");
+        require(addressArray.length == balanceArray.length, "Array length not match");
+        address contractorAddr = address(this);
+
+        //iterate through the array
+        for (uint i = 0; i < addressArray.length; i++) {
+            require(balanceArray[i] > 0);                          
+            require(balanceArray[i] + _icoDepositTotal <= ABRoundLimit, "_icoDepositTotal out of the limit!"); // > daily limit, trasaction failed.
+            
+            address investorAddress = addressArray[i];
+            require(!bank[investorAddress].locked, "already locked.");
+
+            bank[investorAddress].lastTime = block.timestamp;
+            bank[investorAddress].balance = balanceArray[i];
+            bank[investorAddress].dailyReleaseAmount = balanceArray[i] * dailyRate / 1e8; //amount * dailyRate / 100000000;
+            bank[investorAddress].locked = true;
+            _icoDepositTotal = _icoDepositTotal + balanceArray[i];
+
+            require(token.transferFrom(msg.sender, contractorAddr, balanceArray[i]), "transferFrom failed!"); //check the return value, it should be true           
+        }
+
+        emit icodepositEvt(block.timestamp, _icoDepositTotal);
+        return (block.timestamp, _icoDepositTotal);
     }
     
     /* investor call this function from the dapp to check the amount of their coins in the AB round locked contract
