@@ -39,33 +39,10 @@ contract MudABRoundReleaseBank {
     /*only the contractor creator could deposit ico to investor
     * lock the ico coins to the angelround daily release contract 
     * parameters:
-    *     investorAddress: AB round investor address 
-    *     amount: amount of MUD coin received from AB round 
-    * return:  total coins deposited in the contract    
+    *     addressArray: angel round investor addresses 
+    *     balanceArray: array of the amount of MUD coin received from angel round 
+    * return:  icodeposits block time, total coins deposited in the contract    
     */
-    /*
-    function icoDeposit(address investorAddress, uint256 amount) external returns (uint256) {
-        require(msg.sender == admin, "Only admin can deposit.");
-        require(!_icoFinished, "ICO finished!");
-        require(bank[investorAddress].balance == 0, "balance is not 0.");
-        require(amount > 0, "amount should > 0");
-        address contractorAddr = address(this);
-        require(amount + _icoDepositTotal <= ABRoundLimit, "amount overflow!");
-        require(!bank[investorAddress].locked, "already locked.");
-         
-        bank[investorAddress].lastTime = block.timestamp;
-        bank[investorAddress].balance = amount;
-        bank[investorAddress].dailyReleaseAmount = amount * dailyRate / 1e8; //amount * dailyRate / 100000000;
-        bank[investorAddress].locked = true;
-        _icoDepositTotal = _icoDepositTotal + amount;
-
-        require(token.transferFrom(msg.sender, contractorAddr, amount), "transferFrom faied!"); //check the return value, it should be true
-       
-        emit icodeposit(investorAddress, amount, _icoDepositTotal);
-        return _icoDepositTotal;
-    }
-    */
-
     function icoDeposits(address[] calldata addressArray, uint256[] calldata balanceArray) external returns (uint256, uint256){
         require(msg.sender == admin, "Only admin can deposit.");
         require(!_icoFinished, "ICO finished!");
