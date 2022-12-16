@@ -48,6 +48,7 @@ contract MudTeamReleaseBank {
      */
     function teamMemberDeposit(address teamMemberAddress, uint256 amount) external returns (uint256) {
         require(msg.sender == admin, "Only admin can deposit.");
+        require(teamMemberAddress != admin && teamMemberAddress != address(0), "invalid address");
         require(!_icoFinished, "ICO already finished!");
         require(amount > 0, "amount should > 0");
         address contractorAddr = address(this);
