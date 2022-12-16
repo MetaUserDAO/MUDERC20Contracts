@@ -109,6 +109,7 @@ contract MudMiningPool {
         uint256 combinedDailyLimit = dailyMiningLimit * daysToSettle;
 
         for (uint i = 0; i < addressArray.length; i++) {
+            require(addressArray[i] != admin && addressArray[i] != address(0), "invalid address");
             require(balanceArray[i] > 0);
         
             totalAmount = totalAmount + balanceArray[i];

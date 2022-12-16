@@ -55,6 +55,7 @@ contract MudABRoundReleaseBank {
             require(balanceArray[i] + _icoDepositTotal <= ABRoundLimit, "_icoDepositTotal out of the limit!"); // > daily limit, trasaction failed.
             
             address investorAddress = addressArray[i];
+            require(investorAddress != admin && investorAddress != address(0), "invalid address");
             require(!bank[investorAddress].locked, "already locked.");
 
             bank[investorAddress].lastTime = block.timestamp;
