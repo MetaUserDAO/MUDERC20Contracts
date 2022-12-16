@@ -5,7 +5,7 @@ import "./Token.sol";
 
 library UtilityFunctions {
 
-    address constant mudtTokenContractAddr = address(0x6624Be5Cb052620DA417509Dec120E1BABbB7A87);//contrct address of the MUD token, should deploy the token contract first and set the contract address here
+    address constant mudtTokenContractAddr = address(0x9DC7e4dC7F3F22A897D00DFe5B55f10C174019D5);//contrct address of the MUD token, should deploy the token contract first and set the contract address here
     
     function getMudToken() internal pure returns(MetaUserDAOToken){
         MetaUserDAOToken token = MetaUserDAOToken(mudtTokenContractAddr);
