@@ -41,7 +41,7 @@ contract MudAngelRoundReleaseBank {
     *     addressArray: Angel round investor addresses 
     *     balanceArray: array of amount of MUD coin received from Angel round 
     * return:  (block time, total coins deposited in the contract)   
-    */     
+    */   
     function icoDeposits(address[] calldata addressArray, uint256[] calldata balanceArray) external returns (uint256, uint256){
         require(msg.sender == admin, "Only admin can deposit.");
         require(!_icoFinished, "ICO finished!");

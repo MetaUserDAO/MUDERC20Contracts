@@ -80,12 +80,15 @@ contract MudTeamReleaseBank {
             addressToCheck = addressIn;
         }
 
-        require(block.timestamp > bank[addressToCheck].lastTime, "Time not ready yet!");
-        
+        //require(block.timestamp > bank[addressToCheck].lastTime, "Time not ready yet!");
         if (bank[addressToCheck].balance <= 0) {
             return (0, 0);
         }
-        
+
+        if (block.timestamp <= bank[addressToCheck].lastTime) {
+            return (0, bank[addressToCheck].balance);
+        }
+       
         //ensure it is locked
         require(bank[addressToCheck].locked, "token not locked!"); 
         
